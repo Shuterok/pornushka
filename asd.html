@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Anime Gallery</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+    }
+    header {
+      width: 100%;
+      padding: 20px 0;
+      text-align: center;
+      background-color: #333;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    section {
+      flex: 1;
+      padding: 20px 10px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    footer {
+      width: 100%;
+      padding: 20px 0;
+      text-align: center;
+      background-color: #333;
+    }
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 480px;
+      width: 100%;
+    }
+    .gallery img {
+      width: 100%;
+      max-width: 480px;
+      height: auto;
+      margin-bottom: 20px;
+      border: 2px solid #fff;
+      box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.5);
+    }
+    #scroll-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background-color: rgba(51, 51, 51, 0.9);
+      color: white;
+      border: 1px solid #fff;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #scroll-button:hover {
+      background-color: rgba(80, 80, 80, 0.9);
+    }
+
+    /* Плавающее окошко справа 480x480 для ПК */
+    .sidebar {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      width: 480px;
+      height: 480px;
+      background-color: rgba(20, 20, 20, 0.95);
+      border: 2px solid #fff;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      z-index: 998;
+    }
+    .sidebar img {
+      max-width: 100%;
+      max-height: 410px;
+      object-fit: contain;
+      border: 1px solid #555;
+      margin-bottom: 10px;
+    }
+    .sidebar button {
+      padding: 6px 14px;
+      background-color: #333;
+      color: white;
+      border: 1px solid #fff;
+      cursor: pointer;
+    }
+    .sidebar button:hover {
+      background-color: #555;
+    }
+
+    /* Адаптация под телефон (экраны уже 1100px) */
+    @media (max-width: 1100px) {
+      .sidebar {
+        position: static;
+        width: calc(100% - 20px);
+        max-width: 480px;
+        height: 480px;
+        margin: 10px auto 30px;
+      }
+      #scroll-button {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Anime Gallery</h1>
+  </header>
+
+  <section>
+    <div class="gallery">
+      <img src="https://wimg.rule34.xxx//images/7863/cf19a9539bdb362dc4781bc9bcd090f9.jpeg?8985053" alt="Anime Porn Thigh-Highs">
+      <img src="https://wimg.rule34.xxx//samples/1658/sample_d1dbdc694cd7fec5d6fb7911fec92e54.jpg?19388136" alt="Gallery Image 1">
+      <img src="https://wimg.rule34.xxx//images/3128/71ed366de4ef7a9890ea6565b3c4dea7.jpeg?18867230" alt="Gallery Image 2">
+      <img src="https://wimg.rule34.xxx//samples/10/sample_b2bc4ada13f57388dc909ec0a09d63ef.jpg?11390159" alt="Gallery Image 3">
+    </div>
+  </section>
+
+  <!-- Плавающее окно (на ПК справа, на телефоне под галереей) -->
+  <aside class="sidebar">
+    <img id="random-art" src="" alt="Загрузка...">
+    <button id="refresh-art">Следующая картинка</button>
+  </aside>
+
+  <button id="scroll-button">Go to RealBooru Video Page</button>
+
+  <footer>
+    <p>&copy; 2026 Anime Gallery</p>
+  </footer>
+
+  <script>
+    const WORKER_URL = 'https://workers.dev';
+
+    document.getElementById('scroll-button').addEventListener('click', function() {
+      window.location.href = 'https://realbooru.com';
+    });
+
+    async function fetchRandomImage() {
+      const imgElement = document.getElementById('random-art');
+      imgElement.removeAttribute('src');
+      imgElement.alt = 'Загрузка...';
+
+      try {
+        const res = await fetch(WORKER_URL);
+        if (!res.ok) throw new Error('Ошибка сервера: ' + res.status);
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          const randomPost = data[Math.floor(Math.random() * data.length)];
+          imgElement.src = randomPost.sample_url || randomPost.file_url;
+          imgElement.alt = 'Случайный арт';
+        } else {
+          imgElement.alt = 'Посты по тегам не найдены или ошибка API';
+        }
+      } catch (error) {
+        imgElement.alt = 'Ошибка: ' + error.message;
+      }
+    }
+
+    document.getElementById('refresh-art').addEventListener('click', fetchRandomImage);
+    fetchRandomImage();
+  </script>
+</body>
+</html>

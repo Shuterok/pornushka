@@ -150,7 +150,7 @@
   </footer>
 
   <script>
-    const WORKER_URL = 'https://workers.dev';
+    const API_ENDPOINT = '/api/art';
 
     document.getElementById('scroll-button').addEventListener('click', function() {
       window.location.href = 'https://realbooru.com';
@@ -162,16 +162,24 @@
       imgElement.alt = 'Загрузка...';
 
       try {
-        const res = await fetch(WORKER_URL);
-        if (!res.ok) throw new Error('Ошибка сервера: ' + res.status);
-        const data = await res.json();
+        const res = await fetch(API_ENDPOINT);
+        const text = await res.text();
 
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+
+        if (!text.trim().startsWith('[')) {
+          throw new Error('Сервер вернул не список картинок: ' + text.slice(0, 80));
+        }
+
+        const data = JSON.parse(text);
         if (Array.isArray(data) && data.length > 0) {
           const randomPost = data[Math.floor(Math.random() * data.length)];
           imgElement.src = randomPost.sample_url || randomPost.file_url;
           imgElement.alt = 'Случайный арт';
         } else {
-          imgElement.alt = 'Посты по тегам не найдены или ошибка API';
+          imgElement.alt = 'Посты по тегам не найдены';
         }
       } catch (error) {
         imgElement.alt = 'Ошибка: ' + error.message;
